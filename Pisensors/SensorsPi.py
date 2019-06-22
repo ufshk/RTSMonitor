@@ -3,6 +3,10 @@ import time
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import Adafruit_DHT
+
+sensor = Adafruit_DHT.DHT11
+pin = 13
 
 cred = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred)
@@ -41,7 +45,9 @@ while x < 1:
     pulse_duration = pulse_end_time - pulse_start_time
     distance = round(pulse_duration * 17150, 2)
     print("Distance:",distance,"cm")
-
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    print("Temperature: " + temperature + " humidity: " + humidity)
+    
     data = {
         u'distance': distance
     }
