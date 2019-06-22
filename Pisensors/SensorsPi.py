@@ -55,4 +55,4 @@ while x < 1:
     time.sleep(5)
 GPIO.cleanup()
 
-
+sudo apt-get install build-essential python-dev python-openssl git
