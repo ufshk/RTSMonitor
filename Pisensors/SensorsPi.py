@@ -1,8 +1,21 @@
 import RPi.GPIO as GPIO
 import time
+from firebase import firebase
 
 x = 0
 
+firebase = firebase.FirebaseApplication('https://rts-monitor.firebaseio.com', None)
+new_user = 'Ozgur Vatansever'
+
+result = firebase.post('devices', new_user, {'print': 'pretty'}, {'X_FANCY_HEADER': 'VERY FANCY'})
+print result(
+{u'name': u'-Io26123nDHkfybDIGl7'})
+
+result = firebase.post('/users', new_user, {'print': 'silent'}, {'X_FANCY_HEADER': 'VERY FANCY'})
+print result == None
+True
+
+'''
 while x < 1:
       GPIO.setmode(GPIO.BOARD)
 
@@ -37,3 +50,4 @@ while x < 1:
 
 
 GPIO.cleanup()
+'''
