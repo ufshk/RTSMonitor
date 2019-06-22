@@ -1,71 +1,40 @@
 import React, { Component } from 'react'
 import './App.css'
-import { messageHandler, sendMessage, clientHandler } from './api.js'
+import firebase from 'firebase'
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCcfNhXu0Bk8-cWXx1rpAHh3uGigcGTg6A",
+    authDomain: "rts-monitor.firebaseapp.com",
+    databaseURL: "https://rts-monitor.firebaseio.com",
+    projectId: "rts-monitor",
+    storageBucket: "rts-monitor.appspot.com",
+    messagingSenderId: "94661493840",
+    appId: "1:94661493840:web:6e33e832e19fb7ef"
+}
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      messages: [],
-      message: '',
-      numOfClients: 1
-    }
-    this.handleSubmit = this._handleSubmit.bind(this)
-    this.handleChange = this._handleChange.bind(this)
-    this.setNumOfClients = this._setNumOfClients.bind(this)
-    this.addMessage = this._addMessage.bind(this)
+    this.state = {}
   }
 
   componentDidMount() {
-    messageHandler(this.addMessage)
-    clientHandler(this.setNumOfClients)
-  }
-
-  _setNumOfClients(numOfClients) {
-    if (numOfClients !== this.state.numOfClients) {
-      this.setState({ numOfClients })
-    }
-  }
-
-  messageView() {
-    return (
-      this.state.messages.map((msg, index) => {
-        return <p key={index}>{msg}</p>
+    firebase.initializeApp(firebaseConfig)
+    const db = firebase.firestore()
+    db.collection('devices').onSnapshot(querySnapshot => {
+      let curState = this.state
+      querySnapshot.forEach(doc => {
+        let data = doc.data()
+        curState[doc.id] = data
       })
-    )
-  }
-
-  _addMessage(msg) {
-    let newMessages = this.state.messages
-    newMessages.push(msg)
-    this.setState({
-      messages: newMessages,
-      message: ''
+      this.setState(curState)
     })
-  }
-
-  _handleSubmit() {
-    sendMessage(this.state.message)
-  }
-
-  _handleChange(event) {
-    this.setState({ message: event.target.value })
   }
 
   render() {
     return (
       <div>
-        <div className="clientNum">{'Number of Clients: ' + this.state.numOfClients}</div>
-        <div className='messageWrapper'>
-          {this.messageView()}
-          <input
-            className='messageBox'
-            type='text'
-            value={this.state.message}
-            onChange={this.handleChange}
-          />
-          <button className='submitButton' onClick={this.handleSubmit}>Submit</button>
-        </div>
+        
       </div>
     )
   }
