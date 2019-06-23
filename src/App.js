@@ -22,9 +22,11 @@ class App extends Component {
       data: {},
       status: 'Offline',
       elapsed: 0,
-      motorSpeed: 0
+      motorSpeed: 0,
+      mode: true
     }
     this.prevTime = Date.now()
+    this.changeMode = this._changeMode.bind(this)
   }
 
   componentDidMount() {
@@ -64,6 +66,9 @@ class App extends Component {
     this.db.collection('control').doc('MotorController').get().then(doc => {
       this.setState({ motorSpeed: doc.data().speed })
     })
+    this.db.collection('flag').doc('Mode').get().then(doc => {
+      this.setState({ mode: doc.data().value })
+    })
   }
 
   tick = () => {
@@ -87,6 +92,14 @@ class App extends Component {
       })
     }
     this.setState(newState)
+  }
+
+  _changeMode() {
+    let newMode = !this.state.mode
+    this.setState({ mode: newMode })
+    this.db.collection('flag').doc('Mode').set({
+      value: newMode
+    })
   }
 
   _handleClick(isRight) {
@@ -114,6 +127,11 @@ class App extends Component {
     return (
       <div>
         <h1>ENGHACK 2019 RTS Monitor</h1>
+        <div className="graph">
+          <Button onClick={this.changeMode} variant="contained" color="primary">
+            Toggle Mode
+          </Button>
+        </div>
         {this.state.status === 'Online' &&
           <h2 className="green">{this.state.status}</h2> 
         }
