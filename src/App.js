@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import './App.css'
 import firebase from 'firebase'
 import 'typeface-roboto'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import Button from '@material-ui/core/Button'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 
 const firebaseConfig = {
     apiKey: "AIzaSyCcfNhXu0Bk8-cWXx1rpAHh3uGigcGTg6A",
@@ -20,7 +21,8 @@ class App extends Component {
     this.state = {
       data: {},
       status: 'Offline',
-      elapsed: 0
+      elapsed: 0,
+      motorSpeed: 0
     }
     this.prevTime = Date.now()
   }
@@ -28,7 +30,7 @@ class App extends Component {
   componentDidMount() {
     firebase.initializeApp(firebaseConfig)
     this.db = firebase.firestore()
-    let newState = this.state
+    let newDataState = this.state.data
     this.db.collection('devices').onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {
         let newData = {
@@ -37,14 +39,14 @@ class App extends Component {
           pv: 2400,
           amt: 1200,
         }
-        if (!newState.data[doc.id]) {
-          newState.data[doc.id] = [newData]
+        if (!newDataState[doc.id]) {
+          newDataState[doc.id] = [newData]
         } else {
-          if (newState.data[doc.id].length >= 30) {
-            newState.data[doc.id].shift()
+          if (newDataState[doc.id].length >= 30) {
+            newDataState[doc.id].shift()
           }
-          newState.data[doc.id] = [
-            ...newState.data[doc.id],
+          newDataState[doc.id] = [
+            ...newDataState[doc.id],
             newData
           ]
         }
@@ -57,7 +59,10 @@ class App extends Component {
         this.timer = setInterval(this.tick, 50)
         this.prevTime = Date.now()
       }
-      this.setState(newState)
+      this.setState({ data: newDataState })
+    })
+    this.db.collection('control').doc('MotorController').get().then(doc => {
+      this.setState({ motorSpeed: doc.data().speed })
     })
   }
 
@@ -79,6 +84,27 @@ class App extends Component {
       })
     }
     this.setState(newState)
+  }
+
+  _handleClick(isRight) {
+    let curMotorSpeed = this.state.motorSpeed
+    if (isRight) {
+      if (curMotorSpeed + 10 <= 100) {
+        curMotorSpeed += 10
+      } else {
+        curMotorSpeed = 100
+      }
+    } else {
+      if (curMotorSpeed - 10 >= 0) {
+        curMotorSpeed -= 10
+      } else {
+        curMotorSpeed = 0
+      }
+    }
+    this.setState({ motorSpeed: curMotorSpeed })
+    this.db.collection('control').doc('MotorController').set({
+      speed: curMotorSpeed
+    })
   }
   
   render() {
@@ -131,16 +157,25 @@ class App extends Component {
         </div>
         <div className="space"></div>
         <div className="container">
-          <h3>Motor</h3>
-          <button>
-
-          </button>
-          <input type="text">
-
-          </input>
-          <button>
-            
-          </button>
+          <h3>Motor Speed (in %)</h3>
+          <div className="bottom-space">
+            <Button onClick={this._handleClick.bind(this, false)} variant="contained" color="primary">
+              &larr;
+            </Button>
+            <span className="motorSpeed">{this.state.motorSpeed}</span>
+            <Button onClick={this._handleClick.bind(this, true)} variant="contained" color="primary">
+              &rarr;
+            </Button>
+          </div>
+          <div className="graph">
+            <LineChart width={600} height={300} data={this.state.data['Motor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <Line type="monotone" dataKey="uv" stroke="#FF69B4" />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+            </LineChart>
+          </div>
         </div>
         <div className="space"></div>
       </div>
