@@ -6,19 +6,20 @@ from firebase_admin import firestore
 import Adafruit_DHT
 
 sensor = Adafruit_DHT.DHT11
-pin = 13
+pin = 27
 
 cred = credentials.Certificate('./serviceAccountKey.json')
+
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 x = 0
 
 while x < 1:
-    GPIO.setmode(GPIO.BOARD)
+    GPIO.setmode(GPIO.BCM)
 
-    PIN_TRIGGER = 7
-    PIN_ECHO = 11
+    PIN_TRIGGER = 18
+    PIN_ECHO = 24
 
     GPIO.setup(PIN_TRIGGER, GPIO.OUT)
     GPIO.setup(PIN_ECHO, GPIO.IN)
@@ -46,13 +47,21 @@ while x < 1:
     distance = round(pulse_duration * 17150, 2)
     print("Distance:",distance,"cm")
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    print("Temperature: " + temperature + " humidity: " + humidity)
+    print("Temperature: ",temperature, " humidity: ", humidity)
     
     data = {
-        u'distance': distance
+        u'value': distance,   
     }
     db.collection(u'devices').document(u'DistanceSensor').set(data)
-    time.sleep(5)
-GPIO.cleanup()
+    data = {
+        u'value': temperature,   
+    }
+    db.collection(u'devices').document(u'TemperatureSensor').set(data)
+    data = {
+        u'value': humidity,   
+    }
+    db.collection(u'devices').document(u'HumiditySensor').set(data)
+    
+    time.sleep(1.5)
 
-sudo apt-get install build-essential python-dev python-openssl git
+GPIO.cleanup()
