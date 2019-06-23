@@ -6,36 +6,45 @@ from firebase_admin import firestore
 import Adafruit_DHT
 
 sensor = Adafruit_DHT.DHT11
-pin = 27
 
+#Firebase Credentials
 cred = credentials.Certificate('./serviceAccountKey.json')
-
 firebase_admin.initialize_app(cred)
-
 db = firestore.client()
+
+#Counter
 x = 0
 
+#Mapping
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PIN_TRIGGER, GPIO.OUT)
+GPIO.setup(PIN_ECHO, GPIO.IN)
+
+#Pins
+PIN_TRIGGER = 18
+PIN_ECHO = 24
+PIN_DHT11 = 27
+
+
 while x < 1:
-    GPIO.setmode(GPIO.BCM)
+    distance = distance()
+    
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, PIN_DHT11)
+    print("Temperature: ",temperature, " humidity: ", humidity)
+    
+    Data_Send(distance, temperature, humidity)
+    time.sleep(1.5)
+    GPIO.cleanup()
 
-    PIN_TRIGGER = 18
-    PIN_ECHO = 24
 
-    GPIO.setup(PIN_TRIGGER, GPIO.OUT)
-    GPIO.setup(PIN_ECHO, GPIO.IN)
 
+def Distance():
     GPIO.output(PIN_TRIGGER, GPIO.LOW)
-
     print("Waiting for sensor to settle")
-
     time.sleep(1)
-
     print("Calculating distance")
-
     GPIO.output(PIN_TRIGGER, GPIO.HIGH)
-
     time.sleep(0.00001)
-
     GPIO.output(PIN_TRIGGER, GPIO.LOW)
 
     while GPIO.input(PIN_ECHO)==0:
@@ -46,9 +55,10 @@ while x < 1:
     pulse_duration = pulse_end_time - pulse_start_time
     distance = round(pulse_duration * 17150, 2)
     print("Distance:",distance,"cm")
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    print("Temperature: ",temperature, " humidity: ", humidity)
-    
+
+    return distance
+
+def Data_Send(distance, temperature, humidity):
     data = {
         u'value': distance,   
     }
@@ -62,6 +72,3 @@ while x < 1:
     }
     db.collection(u'devices').document(u'HumiditySensor').set(data)
     
-    time.sleep(1.5)
-
-GPIO.cleanup()
