@@ -167,6 +167,7 @@ class App extends Component {
               &rarr;
             </Button>
           </div>
+          <h3>Motor RPM</h3>
           <div className="graph">
             <LineChart width={600} height={300} data={this.state.data['Motor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
               <Line type="monotone" dataKey="uv" stroke="#FF69B4" />
