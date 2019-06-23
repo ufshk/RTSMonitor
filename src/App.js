@@ -82,6 +82,9 @@ class App extends Component {
       this.db.collection('control').doc('status').set({
         value: newState.status
       })
+      this.db.collection('flag').doc('status').set({
+        value: false
+      })
     }
     this.setState(newState)
   }
