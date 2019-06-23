@@ -23,9 +23,17 @@
   color: #61dafb;
 }
 
-h3 {
+h1, h2, h3 {
   display: flex;
   justify-content: center;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
 }
 
 .graph {

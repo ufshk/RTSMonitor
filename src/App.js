@@ -13,10 +13,16 @@ const firebaseConfig = {
     messagingSenderId: "94661493840",
     appId: "1:94661493840:web:6e33e832e19fb7ef"
 }
+
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      data: {},
+      status: 'Offline',
+      elapsed: 0
+    }
+    this.prevTime = Date.now()
   }
 
   componentDidMount() {
@@ -31,30 +37,58 @@ class App extends Component {
           pv: 2400,
           amt: 1200,
         }
-        if (!newState[doc.id]) {
-          newState[doc.id] = [newData]
+        if (!newState.data[doc.id]) {
+          newState.data[doc.id] = [newData]
         } else {
-          if (newState[doc.id].length >= 30) {
-            newState[doc.id].shift()
+          if (newState.data[doc.id].length >= 30) {
+            newState.data[doc.id].shift()
           }
-          newState[doc.id] = [
-            ...newState[doc.id],
+          newState.data[doc.id] = [
+            ...newState.data[doc.id],
             newData
           ]
         }
       })
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.prevTime = Date.now()
+        this.timer = setInterval(this.tick, 50)
+      } else {
+        this.timer = setInterval(this.tick, 50)
+        this.prevTime = Date.now()
+      }
       this.setState(newState)
     })
   }
+
+  tick = () => {
+    let newState = this.state
+    newState.elapsed = Date.now() - this.prevTime
+    var elapsed = Math.round(newState.elapsed / 100)
+    var deltaTime = (elapsed / 10).toFixed(1)
+    if (deltaTime >= 4.0 && this.state.status === 'Online') {
+      newState.status = 'Offline'
+      newState.elapsed = 0
+    } else if (deltaTime < 4.0 && this.state.status === 'Offline') {
+      newState.status = 'Online'
+      newState.elapsed = 0
+    }
+    this.setState(newState)
+  }
   
   render() {
-    console.log(this.state)
     return (
       <div>
         <h1>ENGHACK 2019 RTS</h1>
+        {this.state.status === 'Online' &&
+          <h2 className="green">{this.state.status}</h2> 
+        }
+        {this.state.status === 'Offline' &&
+          <h2 className="red">{this.state.status}</h2> 
+        }
         <h3>Distance Sensor</h3>
         <div className="graph">
-          <LineChart width={600} height={300} data={this.state['DistanceSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+          <LineChart width={600} height={300} data={this.state.data['DistanceSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="uv" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis dataKey="name" />
@@ -64,7 +98,7 @@ class App extends Component {
         </div>
         <h3>Temperature Sensor</h3>
         <div className="graph">
-          <LineChart width={600} height={300} data={this.state['TemperatureSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+          <LineChart width={600} height={300} data={this.state.data['TemperatureSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="uv" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis dataKey="name" />
@@ -74,7 +108,7 @@ class App extends Component {
         </div>
         <h3>Humidity Sensor</h3>
         <div className="graph">
-          <LineChart width={600} height={300} data={this.state['HumiditySensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+          <LineChart width={600} height={300} data={this.state.data['HumiditySensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <Line type="monotone" dataKey="uv" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis dataKey="name" />
