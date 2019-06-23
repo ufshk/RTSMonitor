@@ -66,10 +66,10 @@ class App extends Component {
     newState.elapsed = Date.now() - this.prevTime
     var elapsed = Math.round(newState.elapsed / 100)
     var deltaTime = (elapsed / 10).toFixed(1)
-    if (deltaTime >= 4.0 && this.state.status === 'Online') {
+    if (deltaTime >= 8.0 && this.state.status === 'Online') {
       newState.status = 'Offline'
       newState.elapsed = 0
-    } else if (deltaTime < 4.0 && this.state.status === 'Offline') {
+    } else if (deltaTime < 8.0 && this.state.status === 'Offline') {
       newState.status = 'Online'
       newState.elapsed = 0
     }
