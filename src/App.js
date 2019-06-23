@@ -108,7 +108,7 @@ class App extends Component {
           <h3>Temperature Sensor</h3>
           <div className="graph">
             <LineChart width={600} height={300} data={this.state.data['TemperatureSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+              <Line type="monotone" dataKey="uv" stroke="#e85500" />
               <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -121,7 +121,7 @@ class App extends Component {
           <h3>Humidity Sensor</h3>
           <div className="graph">
             <LineChart width={600} height={300} data={this.state.data['HumiditySensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+              <Line type="monotone" dataKey="uv" stroke="#007509" />
               <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
               <XAxis dataKey="name" />
               <YAxis />
