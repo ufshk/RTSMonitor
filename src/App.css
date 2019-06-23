@@ -45,6 +45,15 @@ h1, h2, h3 {
   padding-top: 50px;
 }
 
+.bottom-space {
+  padding-bottom: 20px;
+}
+
+.motorSpeed {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 .container {
   right: 0;
   left: 0;
