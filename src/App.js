@@ -27,9 +27,9 @@ class App extends Component {
 
   componentDidMount() {
     firebase.initializeApp(firebaseConfig)
-    const db = firebase.firestore()
+    this.db = firebase.firestore()
     let newState = this.state
-    db.collection('devices').onSnapshot(querySnapshot => {
+    this.db.collection('devices').onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {
         let newData = {
           name: '',
@@ -73,49 +73,63 @@ class App extends Component {
       newState.status = 'Online'
       newState.elapsed = 0
     }
+    if (newState.elapsed === 0) {
+      this.db.collection('control').doc('status').set({
+        value: newState.status
+      })
+    }
     this.setState(newState)
   }
   
   render() {
     return (
       <div>
-        <h1>ENGHACK 2019 RTS</h1>
+        <h1>ENGHACK 2019 RTS Monitor</h1>
         {this.state.status === 'Online' &&
           <h2 className="green">{this.state.status}</h2> 
         }
         {this.state.status === 'Offline' &&
           <h2 className="red">{this.state.status}</h2> 
         }
-        <h3>Distance Sensor</h3>
-        <div className="graph">
-          <LineChart width={600} height={300} data={this.state.data['DistanceSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
+        <div className="container">
+          <h3>Distance Sensor</h3>
+          <div className="graph">
+            <LineChart width={600} height={300} data={this.state.data['DistanceSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+            </LineChart>
+          </div>
         </div>
-        <h3>Temperature Sensor</h3>
-        <div className="graph">
-          <LineChart width={600} height={300} data={this.state.data['TemperatureSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
+        <div className="space"></div>
+        <div className="container">
+          <h3>Temperature Sensor</h3>
+          <div className="graph">
+            <LineChart width={600} height={300} data={this.state.data['TemperatureSensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+            </LineChart>
+          </div>
         </div>
-        <h3>Humidity Sensor</h3>
-        <div className="graph">
-          <LineChart width={600} height={300} data={this.state.data['HumiditySensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
+        <div className="space"></div>
+        <div className="container">
+          <h3>Humidity Sensor</h3>
+          <div className="graph">
+            <LineChart width={600} height={300} data={this.state.data['HumiditySensor']} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+            </LineChart>
+          </div>
         </div>
+        <div className="space"></div>
       </div>
     )
   }
