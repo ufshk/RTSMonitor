@@ -130,6 +130,19 @@ class App extends Component {
           </div>
         </div>
         <div className="space"></div>
+        <div className="container">
+          <h3>Motor</h3>
+          <button>
+
+          </button>
+          <input type="text">
+
+          </input>
+          <button>
+            
+          </button>
+        </div>
+        <div className="space"></div>
       </div>
     )
   }
